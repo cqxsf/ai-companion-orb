@@ -332,26 +332,34 @@ static void fsm_tick(void)
                 /*
                  * New touch after window expired — emit the pending TAP and
                  * restart detection from DEBOUNCE for this new touch.
+                 * Use first_tap_end_us to get the first tap's actual duration.
                  */
                 uint32_t duration_ms =
-                    (uint32_t)((now_us - s_ctx.touch_start_us) / 1000);
+                    (uint32_t)((s_ctx.first_tap_end_us - s_ctx.touch_start_us) / 1000);
                 fire_event(TOUCH_TAP, s_ctx.peak_mask, duration_ms);
                 s_ctx.touch_start_us  = now_us;
                 s_ctx.peak_mask       = cur_mask;
                 s_ctx.second_tap_seen = false;
+                s_ctx.first_tap_end_us = now_us;
                 s_ctx.state           = FSM_DEBOUNCE;
             }
         } else {
             if (s_ctx.second_tap_seen) {
-                /* Second tap was seen and finger just lifted → DOUBLE_TAP */
+                /*
+                 * Second tap was seen and finger just lifted → DOUBLE_TAP.
+                 * duration_ms spans the full gesture window (first-tap-start
+                 * to second-tap-end), giving the caller the total interaction
+                 * time for the double-tap.
+                 */
                 uint32_t duration_ms =
                     (uint32_t)((now_us - s_ctx.touch_start_us) / 1000);
                 fire_event(TOUCH_DOUBLE_TAP, s_ctx.peak_mask, duration_ms);
                 s_ctx.state = FSM_IDLE;
             } else if (wait_ms > s_ctx.cfg.double_tap_window_ms) {
-                /* Window expired, no second tap seen → emit single TAP */
+                /* Window expired, no second tap seen → emit single TAP with
+                 * the first tap's actual duration. */
                 uint32_t duration_ms =
-                    (uint32_t)((now_us - s_ctx.touch_start_us) / 1000);
+                    (uint32_t)((s_ctx.first_tap_end_us - s_ctx.touch_start_us) / 1000);
                 fire_event(TOUCH_TAP, s_ctx.peak_mask, duration_ms);
                 s_ctx.state = FSM_IDLE;
             }
