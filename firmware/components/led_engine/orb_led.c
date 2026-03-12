@@ -96,6 +96,8 @@ static orb_mood_t   s_current_mood   = ORB_MOOD_IDLE;
 static orb_mood_t   s_target_mood    = ORB_MOOD_IDLE;
 static orb_rgb_t    s_from_color     = {0xFF, 0xA0, 0x40};
 static orb_rgb_t    s_to_color       = {0xFF, 0xA0, 0x40};
+/* Unscaled base colour currently being displayed — used as cross-fade origin */
+static orb_rgb_t    s_current_base   = {0xFF, 0xA0, 0x40};
 static uint32_t     s_transition_ticks_total = 0;
 static uint32_t     s_transition_ticks_done  = 0;
 static bool         s_in_transition  = false;
@@ -343,6 +345,7 @@ static void render_frame(void)
         if (s_transition_ticks_done >= s_transition_ticks_total) {
             s_in_transition   = false;
             s_current_mood    = s_target_mood;
+            s_current_base    = s_to_color;     /* record unscaled arrival colour */
             s_anim_tick       = 0;   /* restart mood-local clock */
             now_ms            = 0;
         }
@@ -357,18 +360,21 @@ static void render_frame(void)
     case ANIM_BREATHE: {
         uint8_t bri = breath_brightness(now_ms);
         fill_all(m->base_color, bri);
+        s_current_base = m->base_color;
         break;
     }
 
     case ANIM_ROTATE: {
-        /* One bright pixel rotates; all others at minimum brightness. */
-        uint32_t period_ticks = (BREATH_PERIOD_MS / ANIM_TICK_MS);
-        uint32_t head = s_anim_tick % s_led_count;
+        /* One bright pixel completes one full revolution per BREATH_PERIOD_MS.
+         * ticks_per_step = period / led_count, advancing head every step. */
+        uint32_t period_ticks    = (BREATH_PERIOD_MS / ANIM_TICK_MS);
+        uint32_t ticks_per_step  = MAX(1, period_ticks / s_led_count);
+        uint32_t head            = (s_anim_tick / ticks_per_step) % s_led_count;
         for (uint32_t i = 0; i < s_led_count; i++) {
             uint8_t bri = (i == head) ? BREATH_MAX_DUTY : BREATH_MIN_DUTY;
             set_pixel(i, m->base_color, bri);
         }
-        (void)period_ticks;
+        s_current_base = m->base_color;
         break;
     }
 
@@ -383,6 +389,7 @@ static void render_frame(void)
                            + norm * (BREATH_MAX_DUTY - BREATH_MIN_DUTY));
             set_pixel(i, m->base_color, bri);
         }
+        s_current_base = m->base_color;
         break;
     }
 
@@ -394,6 +401,7 @@ static void render_frame(void)
         orb_rgb_t c   = use_base ? m->base_color : m->alt_color;
         uint8_t bri   = breath_brightness(now_ms);
         fill_all(c, bri);
+        s_current_base = c;
         break;
     }
 
@@ -404,6 +412,7 @@ static void render_frame(void)
             /* Ripple done — switch back to IDLE without another transition */
             s_current_mood = ORB_MOOD_IDLE;
             s_target_mood  = ORB_MOOD_IDLE;
+            s_current_base = k_mood_table[ORB_MOOD_IDLE].base_color;
             s_anim_tick    = 0;
             fill_all(k_mood_table[ORB_MOOD_IDLE].base_color,
                      breath_brightness(0));
@@ -421,11 +430,13 @@ static void render_frame(void)
                           + norm * (BREATH_MAX_DUTY - BREATH_MIN_DUTY));
             set_pixel(i, m->base_color, bri);
         }
+        s_current_base = m->base_color;
         break;
     }
 
     case ANIM_SOLID:
         fill_all(m->base_color, s_master_brightness);
+        s_current_base = m->base_color;
         break;
     }
 
@@ -501,6 +512,7 @@ esp_err_t orb_led_init(const orb_led_config_t *config)
     s_target_mood    = ORB_MOOD_IDLE;
     s_from_color     = k_mood_table[ORB_MOOD_IDLE].base_color;
     s_to_color       = k_mood_table[ORB_MOOD_IDLE].base_color;
+    s_current_base   = k_mood_table[ORB_MOOD_IDLE].base_color;
     s_in_transition  = false;
     s_anim_tick      = 0;
     s_running        = true;
@@ -539,14 +551,11 @@ esp_err_t orb_led_set_mood(orb_mood_t mood)
 
     const mood_def_t *m = &k_mood_table[mood];
 
-    /* Snapshot the pixel colour we are currently showing as the blend start.
-     * Use the centre LED's colour from the last rendered frame. */
-    s_from_color = (orb_rgb_t){
-        .r = s_pixels[1],   /* GRB: index 1 is R */
-        .g = s_pixels[0],   /* GRB: index 0 is G */
-        .b = s_pixels[2],
-    };
-    s_to_color   = m->base_color;
+    /* Use the tracked unscaled base colour as the cross-fade starting point.
+     * Reading back from the pixel buffer would give brightness-scaled values
+     * and corrupt the transition. */
+    s_from_color  = s_current_base;
+    s_to_color    = m->base_color;
     s_target_mood = mood;
 
     uint32_t dur_ms              = m->transition_ms;
@@ -579,6 +588,7 @@ esp_err_t orb_led_set_color(orb_rgb_t color)
     }
     xSemaphoreTake(s_mutex, portMAX_DELAY);
     s_override_color = color;
+    s_current_base   = color;   /* keep cross-fade origin in sync */
     s_color_override = true;
     s_in_transition  = false;
     xSemaphoreGive(s_mutex);
