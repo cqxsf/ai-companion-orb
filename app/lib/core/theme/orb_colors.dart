@@ -9,9 +9,12 @@ class OrbColors {
   static const Color bgElevated = Color(0xFF1A1A25);
   static const Color bgOverlay = Color(0xFF252530);
 
-  // Borders
-  static const Color borderSubtle = Color(0x14FFFFFF);
-  static const Color borderActive = Color(0x26FFFFFF);
+  // Borders (~8% and ~15% white opacity)
+  static const Color borderSubtle = Color(0x14FFFFFF); // 8% opacity
+  static const Color borderActive = Color(0x26FFFFFF); // 15% opacity
+
+  // Shared alpha for emotion border/glow (30% opacity)
+  static const int emotionBorderAlpha = 77;
 
   // Text
   static const Color textPrimary = Color(0xF2FFFFFF);

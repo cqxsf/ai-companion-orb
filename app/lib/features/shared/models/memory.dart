@@ -35,8 +35,10 @@ class Memory {
     );
   }
 
+  static const int _excerptMaxLength = 80;
+
   String get excerpt {
-    if (content.length <= 80) return content;
-    return '${content.substring(0, 80)}…';
+    if (content.length <= _excerptMaxLength) return content;
+    return '${content.substring(0, _excerptMaxLength)}…';
   }
 }

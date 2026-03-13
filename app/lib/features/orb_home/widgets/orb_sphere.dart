@@ -170,6 +170,17 @@ class _OrbSphereState extends State<OrbSphere>
 }
 
 class _OrbPainter extends CustomPainter {
+  // Alpha constants for sphere gradient layers
+  static const int _glowMidAlpha = 77;         // 30% opacity – mid-glow fade
+  static const int _sphereHighlightAlpha = 230; // 90% opacity – bright sphere cap
+  static const int _spherePrimaryAlpha = 200;   // 78% opacity – primary colour body
+  static const int _highlightSpotAlpha = 100;   // 39% opacity – specular spot
+  // Listening ring animation constants
+  static const double _ringBaseOffset = 16.0;
+  static const double _ringAnimAmplitude = 8.0;
+  static const double _ring2BaseOffset = 28.0;
+  static const double _ring2AnimAmplitude = 6.0;
+
   final Color primaryColor;
   final Color glowColor;
   final double sphereSize;
@@ -196,7 +207,7 @@ class _OrbPainter extends CustomPainter {
       ..shader = RadialGradient(
         colors: [
           glowColor,
-          glowColor.withAlpha(77),
+          glowColor.withAlpha(_glowMidAlpha),
           Colors.transparent,
         ],
         stops: const [0.0, 0.5, 1.0],
@@ -209,10 +220,10 @@ class _OrbPainter extends CustomPainter {
       ..shader = RadialGradient(
         center: const Alignment(-0.3, -0.4),
         colors: [
-          Colors.white.withAlpha(230),
-          primaryColor.withAlpha(230),
-          primaryColor.withAlpha(200),
-          Color.lerp(primaryColor, Colors.black, 0.5)!.withAlpha(255),
+          Colors.white.withAlpha(_sphereHighlightAlpha),
+          primaryColor.withAlpha(_sphereHighlightAlpha),
+          primaryColor.withAlpha(_spherePrimaryAlpha),
+          Color.lerp(primaryColor, Colors.black, 0.5)!,
         ],
         stops: const [0.0, 0.3, 0.7, 1.0],
       ).createShader(Rect.fromCircle(center: center, radius: radius));
@@ -222,19 +233,21 @@ class _OrbPainter extends CustomPainter {
     // Listening ring
     if (isListening) {
       final ringPaint = Paint()
-        ..color = primaryColor.withAlpha(128)
+        ..color = primaryColor.withAlpha(128) // 50% opacity
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2;
 
-      final ringRadius = radius + 16 + 8 * math.sin(animValue * 2 * math.pi);
+      final ringRadius = radius + _ringBaseOffset +
+          _ringAnimAmplitude * math.sin(animValue * 2 * math.pi);
       canvas.drawCircle(center, ringRadius, ringPaint);
 
       final ringPaint2 = Paint()
-        ..color = primaryColor.withAlpha(64)
+        ..color = primaryColor.withAlpha(64) // 25% opacity
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
 
-      final ringRadius2 = radius + 28 + 6 * math.sin(animValue * 2 * math.pi + 1);
+      final ringRadius2 = radius + _ring2BaseOffset +
+          _ring2AnimAmplitude * math.sin(animValue * 2 * math.pi + 1);
       canvas.drawCircle(center, ringRadius2, ringPaint2);
     }
 
@@ -243,7 +256,7 @@ class _OrbPainter extends CustomPainter {
       ..shader = RadialGradient(
         center: const Alignment(-0.4, -0.5),
         colors: [
-          Colors.white.withAlpha(100),
+          Colors.white.withAlpha(_highlightSpotAlpha),
           Colors.transparent,
         ],
       ).createShader(Rect.fromCircle(center: center, radius: radius * 0.5));

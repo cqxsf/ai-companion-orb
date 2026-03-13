@@ -50,11 +50,11 @@ class ChatBubble extends StatelessWidget {
                       bottomRight: Radius.circular(message.isUser ? 4 : 20),
                     ),
                     border: Border.all(
-                      color: message.isUser
-                          ? OrbColors.borderSubtle
-                          : (message.emotion?.color.withAlpha(77) ??
-                              OrbColors.borderSubtle),
-                    ),
+                       color: message.isUser
+                           ? OrbColors.borderSubtle
+                           : (message.emotion?.color.withAlpha(OrbColors.emotionBorderAlpha) ??
+                               OrbColors.borderSubtle),
+                     ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
