@@ -1,0 +1,106 @@
+{
+  "@@locale": "zh",
+  "appTitle": "AI 伴侣球",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "tabHome": "小光",
+  "@tabHome": {
+    "description": "Home tab label"
+  },
+  "tabChat": "对话",
+  "@tabChat": {
+    "description": "Chat tab label"
+  },
+  "tabMemory": "记忆",
+  "@tabMemory": {
+    "description": "Memory tab label"
+  },
+  "tabSettings": "设置",
+  "@tabSettings": {
+    "description": "Settings tab label"
+  },
+  "greetingMorning": "早上好，今天感觉怎么样？",
+  "@greetingMorning": {
+    "description": "Morning greeting"
+  },
+  "greetingAfternoon": "下午好，休息一下吧",
+  "@greetingAfternoon": {
+    "description": "Afternoon greeting"
+  },
+  "greetingEvening": "晚上好，今天过得如何？",
+  "@greetingEvening": {
+    "description": "Evening greeting"
+  },
+  "greetingNight": "夜深了，注意休息哦",
+  "@greetingNight": {
+    "description": "Night greeting"
+  },
+  "emotionCalm": "平静",
+  "emotionJoy": "愉悦",
+  "emotionCare": "关怀",
+  "emotionListen": "倾听",
+  "emotionConcern": "担心",
+  "emotionExcited": "兴奋",
+  "emotionSleep": "休眠",
+  "chatInputHint": "说点什么吧…",
+  "@chatInputHint": {
+    "description": "Chat input placeholder"
+  },
+  "memoryTitle": "记忆",
+  "@memoryTitle": {
+    "description": "Memory page title"
+  },
+  "memorySubtitle": "与小光共同珍藏的每一刻",
+  "@memorySubtitle": {
+    "description": "Memory page subtitle"
+  },
+  "settingsTitle": "设置",
+  "@settingsTitle": {
+    "description": "Settings page title"
+  },
+  "settingsSubtitle": "个性化你的小光",
+  "@settingsSubtitle": {
+    "description": "Settings page subtitle"
+  },
+  "familyTitle": "家人关怀",
+  "@familyTitle": {
+    "description": "Family care page title"
+  },
+  "onboardingWelcome": "你好，我是小光",
+  "onboardingWelcomeSubtitle": "我会陪伴在你身边\n倾听你的故事，分享你的喜怒哀乐",
+  "onboardingStart": "开始认识",
+  "onboardingSkip": "跳过",
+  "onboardingNameQuestion": "你叫什么名字？",
+  "onboardingNameSubtitle": "我想记住你的名字，这样更亲切",
+  "onboardingConnectTitle": "连接你的小光",
+  "onboardingConnectSubtitle": "请将手机靠近小光设备\n确保设备已通电（蓝灯闪烁）",
+  "onboardingDoneTitle": "你好！",
+  "onboardingDoneSubtitle": "小光已经准备好了\n我们开始吧",
+  "errorMemoryNotFound": "记忆不见了",
+  "clearChat": "清空对话",
+  "clearChatConfirm": "确定要清空所有对话记录吗？",
+  "cancel": "取消",
+  "confirm": "确认",
+  "save": "保存",
+  "back": "返回",
+  "version": "版本",
+  "teamName": "成前科技",
+  "privacyPolicy": "隐私政策",
+  "orbName": "小光的名字",
+  "userName": "你的名字",
+  "volume": "音量",
+  "notifications": "推送通知",
+  "notificationsSubtitle": "接收日常关怀提醒",
+  "emergencyNotifications": "紧急通知",
+  "emergencyNotificationsSubtitle": "检测到异常时立即通知家人",
+  "soundEffects": "声音效果",
+  "soundEffectsSubtitle": "互动时播放提示音",
+  "hapticFeedback": "触感反馈",
+  "hapticFeedbackSubtitle": "操作时振动反馈",
+  "defaultEmotion": "默认情绪",
+  "profile": "个人信息",
+  "device": "小光设备",
+  "about": "关于",
+  "interaction": "交互"
+}
