@@ -89,15 +89,57 @@ V4: LED → 光导环(壁厚6mm) → 球壳               （连续光带）
 
 ## 使用方法
 
+### OpenSCAD 环境验证
+
+已在 Apple Silicon macOS 上验证以下安装结果：
+
+- OpenSCAD 版本：2025.05.16
+- 安装路径：`/Applications/OpenSCAD.app`
+- 命令行入口：`/opt/homebrew/bin/openscad`
+- 二进制架构：universal binary（包含 arm64，可原生运行于 M1/M2/M3）
+
+可用以下命令复核本机安装：
+
+```bash
+file /Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD
+/opt/homebrew/bin/openscad --version
+```
+
 ### 预览装配体
 
 1. OpenSCAD 打开 `orb_v4/orb_assembly.scad`
 2. F5 预览 / `EXPLODE = 15;` 爆炸视图 / `SECTION = true;` 剖面
 
+也可直接从命令行启动 GUI：
+
+```bash
+open -a /Applications/OpenSCAD.app hardware/3d_models/orb_v4/orb_assembly.scad
+```
+
 ### 导出 STL
 
 1. 设置 `PRINT_PART = "top";`（或 `"mid"` / `"bottom"` / `"lightguide"`）
 2. F6 渲染 → 导出 STL → 保存到 `exports/`
+
+也可用命令行直接导出：
+
+```bash
+mkdir -p hardware/3d_models/orb_v4/exports
+
+/opt/homebrew/bin/openscad -o hardware/3d_models/orb_v4/exports/top.stl \
+     -D 'PRINT_PART="top"' hardware/3d_models/orb_v4/orb_assembly.scad
+
+/opt/homebrew/bin/openscad -o hardware/3d_models/orb_v4/exports/mid.stl \
+     -D 'PRINT_PART="mid"' hardware/3d_models/orb_v4/orb_assembly.scad
+
+/opt/homebrew/bin/openscad -o hardware/3d_models/orb_v4/exports/bottom.stl \
+     -D 'PRINT_PART="bottom"' hardware/3d_models/orb_v4/orb_assembly.scad
+
+/opt/homebrew/bin/openscad -o hardware/3d_models/orb_v4/exports/lightguide.stl \
+     -D 'PRINT_PART="lightguide"' hardware/3d_models/orb_v4/orb_assembly.scad
+```
+
+建议优先导出这 4 个打印件：上壳、中框、底座、光导环。
 
 ### 修改尺寸
 

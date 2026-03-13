@@ -102,6 +102,59 @@ hardware/3d_models/orb_v4/
 └── exports/                 ← STL 导出（打印用）
 ```
 
+### OpenSCAD 安装与验证
+
+当前开发环境已验证可用：
+
+- OpenSCAD: 2025.05.16
+- 安装路径: `/Applications/OpenSCAD.app`
+- CLI 路径: `/opt/homebrew/bin/openscad`
+- 架构: universal binary，包含 arm64，可原生运行于 Apple Silicon
+
+安装校验命令：
+
+```bash
+file /Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD
+/opt/homebrew/bin/openscad --version
+```
+
+预期结果：二进制信息包含 `arm64`，版本输出为 `OpenSCAD version 2025.05.16`。
+
+### V4 预览与 STL 导出
+
+打开 GUI 预览：
+
+```bash
+open -a /Applications/OpenSCAD.app hardware/3d_models/orb_v4/orb_assembly.scad
+```
+
+推荐预览方式：
+
+1. 打开 `hardware/3d_models/orb_v4/orb_assembly.scad`
+2. 使用 F5 快速预览整体装配
+3. 设置 `EXPLODE = 15;` 查看爆炸图
+4. 设置 `SECTION = true;` 检查内部剖面
+
+命令行导出 STL：
+
+```bash
+mkdir -p hardware/3d_models/orb_v4/exports
+
+/opt/homebrew/bin/openscad -o hardware/3d_models/orb_v4/exports/top.stl \
+	-D 'PRINT_PART="top"' hardware/3d_models/orb_v4/orb_assembly.scad
+
+/opt/homebrew/bin/openscad -o hardware/3d_models/orb_v4/exports/mid.stl \
+	-D 'PRINT_PART="mid"' hardware/3d_models/orb_v4/orb_assembly.scad
+
+/opt/homebrew/bin/openscad -o hardware/3d_models/orb_v4/exports/bottom.stl \
+	-D 'PRINT_PART="bottom"' hardware/3d_models/orb_v4/orb_assembly.scad
+
+/opt/homebrew/bin/openscad -o hardware/3d_models/orb_v4/exports/lightguide.stl \
+	-D 'PRINT_PART="lightguide"' hardware/3d_models/orb_v4/orb_assembly.scad
+```
+
+已验证 `top`、`bottom`、`lightguide` 可正常导出，其中 `lightguide` 的非流形警告已修正。
+
 ### 拓竹打印配置
 
 | 参数 | 设置 |

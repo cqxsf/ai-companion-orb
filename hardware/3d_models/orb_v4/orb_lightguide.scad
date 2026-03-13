@@ -92,13 +92,9 @@ module lightguide_ring() {
         translate([0, 0, -0.1])
             cylinder(h = lightguide_height + 0.2, r = lightguide_inner);
 
-        // --- 顶部出光面微锥角 (改善出光均匀性) ---
-        // 顶面内侧倒角 1mm × 45°，引导光线向外扩散
+        // --- 顶部出光面内侧倒角 (避免共面布尔导致非流形) ---
         translate([0, 0, lightguide_height - 1])
-            difference() {
-                cylinder(h = 1.1, r = lightguide_outer + 0.1);
-                cylinder(h = 1.1, r1 = lightguide_inner, r2 = lightguide_inner + 1);
-            }
+            cylinder(h = 1.2, r1 = lightguide_inner - 0.05, r2 = lightguide_inner + 1.05);
     }
 }
 
