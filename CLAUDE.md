@@ -6,7 +6,7 @@
 
 ## 一、项目定位
 
-**AI Companion Orb** 是一个 85mm 球形 AI 陪伴设备，面向独居老人和远程照护家庭。
+**AI Companion Orb** 是一个 Ø98mm × H68mm V8 外形的 AI 陪伴设备（3D 打印球状机身，H/W=0.69 仿 Apple HomePod mini 比例），面向独居老人和远程照护家庭。
 
 核心理念：**有温度的家庭 IoT** —— 不解决效率，只解决孤独。
 
@@ -68,6 +68,25 @@
 | 网络 | WiFi STA 模式 | BLE 仅用于首次配网 |
 | OTA | 双分区方案 | A/B 分区，回滚保护 |
 
+### V8 硬件规格（PCB + 外壳）
+
+| 项目 | 规格 |
+|------|------|
+| MCU | ESP32-S3 （内置 BLE + WiFi + 触摸控制器）|
+| 外形 | Ø98mm × H68mm，3 段分层（base 15mm / mid 31mm / top 22mm）|
+| PCB | 55mm 圆形 4 层板（Top Signal / GND / 3.3V Power / Bottom Signal），1.6mm |
+| 电源链 | USB-C → TP4056（1A，Rprog=1.2kΩ）→ 18650 + DW01+8205A → ME6211 3.3V LDO |
+| 主灯环 | 16× WS2812B，环形排列，DIN=GPIO18（330Ω 串联保护） |
+| 底部光晕 | 8× WS2812B Halo，30° 下照，3mm 硅胶扩散缝（桌面柔光效果） |
+| 麦克风 | 4× INMP441 I2S：BCLK=GPIO4，LRCK=GPIO5，DATA=GPIO6 |
+| 扬声器 | MAX98357A I2S DAC（独立 I2S 总线）→ 4Ω 3W |
+| 触摸 | ESP32-S3 内置电容触摸，3 区域（上/中/下）|
+| 传感器 | BME280（温湿度+气压）+ MPU6050（IMU）via I2C：SDA=GPIO8，SCL=GPIO9 |
+| I2S 麦克风 | GPIO4(BCLK) / GPIO5(LRCK) / GPIO6(DATA) |
+| I2S 扬声器 | GPIO1(BCLK) / GPIO2(LRC) / GPIO3(DIN) |
+| RF 约束 | ESP32-S3 天线区域铜箔禁空，Mic 呈 90° 环形布局 |
+| LED 5V 供电 | 1000µF 主滤波 + 100nF 去耦；每颗 LED 串 33Ω |
+
 **固件架构约束**：
 - 每个功能模块是独立 ESP-IDF component（在 components/ 下）
 - 主程序 (main/) 只做初始化和事件调度，不含业务逻辑
@@ -121,6 +140,12 @@
 
 灯光是 Orb 的灵魂。灯光引擎是固件中最核心的组件。
 
+### 灯光硬件配置
+
+- **主灯环**: 16 颗 WS2812B，RGB，RMT 驱动，GPIO18（330Ω 保护电阻）
+- **底部 Halo**: 8 颗 WS2812B，30° 向下斜照，3mm 硅胶扩散缝（桌面投影柔光）
+- 两路灯效可独立控制（主环情绪光 + Halo 氛围光同时运行）
+
 ### 呼吸灯参数
 
 ```c
@@ -128,6 +153,10 @@
 #define BREATH_MIN_DUTY     13      // 5% of 255
 #define BREATH_MAX_DUTY     102     // 40% of 255
 #define BREATH_CURVE        SINE    // 正弦波，不用线性
+
+#define MAIN_RING_COUNT     16      // 主灯环 WS2812B 颗数
+#define HALO_RING_COUNT     8       // 底部 Halo 光晕颗数
+#define LED_GPIO_MAIN       18      // RMT DIN 引脚（主环 + Halo 菊链）
 ```
 
 ### 情绪-灯光映射
@@ -172,8 +201,8 @@ typedef enum {
 ## 六、音频流水线
 
 ```
-录音: INMP441 ×3 → I2S → ESP32 Ring Buffer → Opus 编码 → WebSocket → Backend
-播放: Backend → Opus 解码 → I2S → MAX98357A → 扬声器
+录音: INMP441 ×4 (90°环形) → I2S (GPIO4/5/6) → ESP32 Ring Buffer → Opus 编码 → WebSocket → Backend
+播放: Backend → Opus 解码 → I2S (GPIO1/2/3) → MAX98357A → 4Ω 3W 扬声器
 唤醒: ESP32 本地 WakeNet → 检测唤醒词 → 开启录音
 ```
 
@@ -183,6 +212,28 @@ typedef enum {
 - 录音停止: VAD (Voice Activity Detection) 检测到 1.5s 静音自动停止
 - 音频缓冲: 至少 2 秒环形缓冲，防止网络抖动导致断续
 - 扬声器音量: 软件可调 10 级，默认 60%
+- 麦克风 I2S：BCLK=GPIO4，LRCK=GPIO5，DATA=GPIO6
+- 扬声器 I2S（独立总线）：BCLK=GPIO1，LRC=GPIO2，DIN=GPIO3
+
+---
+
+## 六·五、环境传感器
+
+```
+BME280 → 室温 / 湿度 / 气压 → 行为 AI（判断通风、异常高温）
+MPU6050 → 加速度 / 陀螺仪 → 跌倒检测、设备是否被移动
+两者共享 I2C 总线: SDA=GPIO8，SCL=GPIO9
+```
+
+### 传感器数据用途
+
+| 传感器 | 数据 | 业务应用 |
+|--------|------|----------|
+| BME280 | 温度 | 室温异常（>35°C / <10°C）→ 推送关怀 |
+| BME280 | 湿度 | 过干 (<30%) 或过湿 (>80%) → 建议开窗 |
+| BME280 | 气压 | 低气压天气 → 主动关心「今天阴天，腿疼吗」|
+| MPU6050 | 加速度 | 突然强冲击 → 怀疑跌倒 → 立即语音询问 + 子女推送 |
+| MPU6050 | 陀螺仪 | 设备被长时间移位 → 异常告警 |
 
 ---
 
@@ -331,3 +382,8 @@ Week 7-8: 行为基线算法 v1 (规则引擎)
 | 2026-03-12 | 中国市场优先 | 4-2-1 家庭结构刚需 |
 | 2026-03-12 | 品牌 = "有温度的家庭 IoT" | 接地气，中国市场理解门槛低 |
 | 2026-03-12 | Orb 作为"线下交友媒介" | 不限制对话，用设计引导老人回到线下社交 |
+| 2026-03-12 | V8 外形 Ø98mm × H68mm (H/W=0.69) | 消除灯泡感，仿 Apple HomePod mini 比例 |
+| 2026-03-12 | 4 麦环形阵列（替代 3 麦）| 90° 间隔对称，波束成形覆盖更均匀 |
+| 2026-03-12 | 16（主环）+ 8（Halo）颗 WS2812B | 底部光晕提供桌面投影氛围，区分「内容情绪」和「环境氛围」|
+| 2026-03-12 | 添加 BME280 + MPU6050 传感器 | 室温关怀 + 跌倒检测，提升守护维度 |
+| 2026-03-12 | PCB 55mm 圆形 4 层板 | 适配 Ø98mm 外壳内腔，RF 天线留空区 |
