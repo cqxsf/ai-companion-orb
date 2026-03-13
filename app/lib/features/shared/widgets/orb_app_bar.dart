@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/orb_colors.dart';
-import '../../core/theme/orb_typography.dart';
+import '../../../core/theme/orb_colors.dart';
+import '../../../core/theme/orb_typography.dart';
 import '../models/orb_emotion.dart';
 
 class OrbAppBar extends StatelessWidget implements PreferredSizeWidget {

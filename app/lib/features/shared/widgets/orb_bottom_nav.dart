@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/orb_colors.dart';
-import '../../core/theme/orb_typography.dart';
+import '../../../core/theme/orb_colors.dart';
+import '../../../core/theme/orb_typography.dart';
 import '../models/orb_emotion.dart';
 
 class OrbBottomNav extends StatelessWidget {
@@ -27,6 +27,7 @@ class OrbBottomNav extends StatelessWidget {
         ),
       ),
       child: SafeArea(
+        top: false,
         child: SizedBox(
           height: 64,
           child: Row(
@@ -90,24 +91,24 @@ class _NavItem extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
                 decoration: BoxDecoration(
                   color: isSelected ? selectedColor.withAlpha(26) : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Icon(
                   icon,
-                  size: 24,
+                  size: 22,
                   color: isSelected ? selectedColor : OrbColors.textTertiary,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 1),
               Text(
                 label,
                 style: OrbTypography.labelSmall.copyWith(

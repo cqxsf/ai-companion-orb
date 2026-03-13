@@ -3,6 +3,7 @@ import '../../../core/theme/orb_colors.dart';
 import '../../../core/theme/orb_typography.dart';
 import '../../../core/theme/orb_spacing.dart';
 import '../../shared/models/message.dart';
+import '../../shared/models/orb_emotion.dart';
 
 class ChatBubble extends StatelessWidget {
   final Message message;

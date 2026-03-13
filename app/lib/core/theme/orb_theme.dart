@@ -41,12 +41,12 @@ class OrbTheme {
         titleTextStyle: OrbTypography.titleLarge,
         iconTheme: IconThemeData(color: OrbColors.textPrimary),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: const CardTheme(
         color: OrbColors.bgCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: OrbColors.borderSubtle),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          side: BorderSide(color: OrbColors.borderSubtle),
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
@@ -104,12 +104,12 @@ class OrbTheme {
         color: OrbColors.textSecondary,
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return OrbColors.calm;
+        thumbColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) return OrbColors.calm;
           return OrbColors.textTertiary;
         }),
-        trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return OrbColors.calmGlow;
+        trackColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) return OrbColors.calmGlow;
           return OrbColors.bgOverlay;
         }),
       ),

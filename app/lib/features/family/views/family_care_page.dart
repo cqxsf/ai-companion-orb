@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/orb_colors.dart';
 import '../../../core/theme/orb_spacing.dart';
 import '../../../core/theme/orb_typography.dart';
+import '../../shared/models/orb_emotion.dart';
 import '../controllers/family_controller.dart';
 
 class FamilyCarePage extends ConsumerWidget {

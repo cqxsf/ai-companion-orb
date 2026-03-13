@@ -4,6 +4,7 @@ import '../../../core/theme/orb_colors.dart';
 import '../../../core/theme/orb_typography.dart';
 import '../../../core/theme/orb_spacing.dart';
 import '../../shared/models/memory.dart';
+import '../../shared/models/orb_emotion.dart';
 
 class MemoryCard extends StatelessWidget {
   final Memory memory;

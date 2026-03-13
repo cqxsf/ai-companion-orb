@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/orb_colors.dart';
 import '../../../core/theme/orb_spacing.dart';
 import '../../../core/theme/orb_typography.dart';
+import '../../shared/models/orb_emotion.dart';
 import '../controllers/memory_controller.dart';
 
 const _kWeekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
