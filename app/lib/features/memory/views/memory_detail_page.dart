@@ -6,6 +6,8 @@ import '../../../core/theme/orb_spacing.dart';
 import '../../../core/theme/orb_typography.dart';
 import '../controllers/memory_controller.dart';
 
+const _kWeekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
 class MemoryDetailPage extends ConsumerWidget {
   final String memoryId;
 
@@ -182,8 +184,7 @@ class MemoryDetailPage extends ConsumerWidget {
   }
 
   String _formatFullDate(DateTime date) {
-    const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-    final weekday = weekdays[date.weekday - 1];
+    final weekday = _kWeekdays[date.weekday - 1];
     return '${date.year}年${date.month}月${date.day}日 $weekday';
   }
 }

@@ -164,7 +164,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                     TextButton(
                       onPressed: () => Navigator.pop(ctx),
                       child: Text('取消',
-                          style: TextStyle(color: OrbColors.textSecondary)),
+                          style: const TextStyle(color: OrbColors.textSecondary)),
                     ),
                     TextButton(
                       onPressed: () {
@@ -172,7 +172,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                         Navigator.pop(ctx);
                       },
                       child: Text('清空',
-                          style: TextStyle(color: OrbColors.excited)),
+                          style: const TextStyle(color: OrbColors.excited)),
                     ),
                   ],
                 ),

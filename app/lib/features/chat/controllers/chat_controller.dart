@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/models/message.dart';
 import '../../shared/models/orb_emotion.dart';
@@ -90,8 +91,7 @@ class ChatController extends StateNotifier<ChatState> {
   }
 
   void _sendAiReply() {
-    final responseIndex =
-        DateTime.now().millisecondsSinceEpoch % _aiResponses.length;
+    final responseIndex = Random().nextInt(_aiResponses.length);
     final (content, emotion) = _aiResponses[responseIndex];
 
     final aiMessage = Message(
